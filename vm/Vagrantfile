@@ -1,0 +1,69 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-16.04"
+  config.vm.synced_folder "~/", "/host_home", type: "virtualbox"
+  config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "8192"
+    vb.cpus = "4"
+  end
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+      sudo apt-get update
+  
+      sudo echo "LC_ALL=\"en_US.UTF-8\"" >> /etc/environment
+      sudo locale-gen UTF-8
+  
+      sudo apt-get install -y git
+      sudo apt-get install -y wget
+      sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      sudo apt-get update
+      sudo apt-get install -y docker-ce
+      sudo usermod -aG docker ${USER}
+      su - ${USER}
+
+      curl https://getmic.ro | sudo bash
+      sudo mv ./micro /usr/local/bin
+
+      echo "Installing Java..."
+      sudo apt-get -y install software-properties-common
+      sudo add-apt-repository ppa:webupd8team/java
+      sudo apt-get -y update
+      echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+      sudo apt-get -y install oracle-java8-installer
+      sudo update-java-alternatives -s java-8-oracle
+
+      echo "Installing Go..."
+      wget https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz
+      sudo tar -C /usr/local -xzf go1.10.3.linux-amd64.tar.gz
+      echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.bash_profile
+      echo "export GOPATH=/go_projects" >> $HOME/.bash_profile
+      export PATH=$PATH:/usr/local/go/bin
+    
+      echo "Installing Anaconda..."
+      sudo wget https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh -O ~/Anaconda3-5.2.0-Linux-x86_64.sh
+      bash ~/Anaconda3-5.2.0-Linux-x86_64.sh -b
+    
+      echo ". $HOME/.bashrc" >> $HOME/.bash_profile
+      echo "export PATH=$HOME/anaconda3/bin:$PATH" >> $HOME/.bash_profile
+      echo "alias notebook='jupyter notebook --no-browser --ip=0.0.0.0 --NotebookApp.token=\\"\\" --NotebookApp.iopub_data_rate_limit=10000000000'" >> $HOME/.bash_profile
+    
+      export PATH="$HOME/anaconda3/bin:$PATH"
+      source $HOME/.bash_profile
+
+      $(which pip) install suplemon
+  
+      # this package is necessary for matplotlib to work and not installed by 
+      # default
+      sudo apt-get install -y libgl1-mesa-glx
+  
+      echo "==================================================================="
+      echo "=                             DONE                                ="
+      echo "==================================================================="
+      echo "To log onto the VM:"
+      echo "$ vagrant ssh"  
+    SHELL
+end
