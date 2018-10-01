@@ -1002,6 +1002,7 @@ posts = [{'post_title': 'Y Combinator', 'post_text': '', 'hanesst_id': 1, 'post_
 
 import sys
 import json
+import base64
 import requests
 
 
@@ -1012,15 +1013,15 @@ if __name__ == '__main__':
 
     for post in posts:
         try:
-            # creds = ':'.join([post['username'], 
-            #                   post['pwd_hash']].encode('ascii'))
-            # encoded_creds = base64.b64encode(creds)
-            # del post['username']
-            # del post['pwd_hash']
+            creds = ':'.join([post['username'], 
+                              post['pwd_hash']]).encode('ascii')
+            encoded_creds = base64.b64encode(creds)
+            del post['username']
+            del post['pwd_hash']
 
-            headers = {'Connection': 'close', 'Content-Type': 'application/json'}
-            # , 
-            #             'Authorization': 'Basic {}'.format(encoded_creds)}
+            headers = {'Connection': 'close', 
+                       'Content-Type': 'application/json', 
+                       'Authorization': 'Basic {}'.format(encoded_creds)}
             response = requests.post(receiver, data=json.dumps(post), 
                                      headers=headers, 
                                      timeout=0.1)
