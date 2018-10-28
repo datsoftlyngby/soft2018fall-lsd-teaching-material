@@ -1016,8 +1016,8 @@ if __name__ == '__main__':
             creds = ':'.join([post['username'], 
                               post['pwd_hash']]).encode('ascii')
             encoded_creds = base64.b64encode(creds)
-            del post['username']
-            del post['pwd_hash']
+            # del post['username']
+            # del post['pwd_hash']
 
             headers = {'Connection': 'close', 
                        'Content-Type': 'application/json', 
