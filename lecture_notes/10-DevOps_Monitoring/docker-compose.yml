@@ -1,0 +1,38 @@
+version: '3'
+services:
+  appserver:
+    build:
+      context: ./my_app
+    image: helgecph/promserver
+    ports:
+      - "8080:8080"
+    network_mode: "host"
+    depends_on:
+      - grafana
+      - prometheus
+
+  appclient:
+    build:
+      context: ./my_client
+    image: helgecph/promclient
+    network_mode: "host"
+    depends_on:
+      - appserver
+      - grafana
+      - prometheus
+
+
+  grafana:
+    image: grafana/grafana:4.5.2
+    ports:
+      - "3000:3000"  
+    network_mode: "host"
+
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    network_mode: "host" 
