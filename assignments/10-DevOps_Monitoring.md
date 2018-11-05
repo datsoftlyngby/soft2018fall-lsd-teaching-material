@@ -1,12 +1,12 @@
 # Assignment: SLA + Monitoring
 
-**Deadline**: Sunday 11th of November 23:59:59
+**Deadline**: Sunday 11th of November 23:55:00
 
 ## Hand-in:
 
   * An URL to your Grafana dashboard
   * Your Grafana dashboard must contain:
-    - At least one dashboard per SLA metric (KPI)
+    - At least one widget per SLA metric (KPI)
     - The SLA itself or a link to the SLA document
 
 
